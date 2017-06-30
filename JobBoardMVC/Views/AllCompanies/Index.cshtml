@@ -1,0 +1,95 @@
+﻿@model IEnumerable<JobBoardMVC.Models.Company>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "../Shared/_Layout.cshtml";
+    @*Global Variables*@
+int companyCount = ViewBag.Counts;
+int maxPagesDisplayed = 5;
+int companiesPerPage = 10;
+}
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>All Companies</title>
+
+</head>
+<body>
+
+    <div>
+        <h3>All Companies</h3>
+        <div class="container tableContainer">
+            <table class="table table-hover table-responsive tablesorter" id="allCompaniesTable">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.CompanyName)</th>
+                        <th>@Html.DisplayNameFor(model => model.City)</th>
+                        <th>@Html.DisplayNameFor(model => model.State)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <!-- <td> tags must have no whitespace -->
+                            <td><a data-toggle="tooltip" data-placement="right"
+                                   title="@Html.DisplayFor(modelItem => item.Description)"
+                                   href="@Url.Action("Details", "CompanyInfo", new { id = item.CompanyName })">@item.CompanyName</a></td>
+                                   @*@Html.ActionLink(item.CompanyName, "Details", "CompanyInfo", new { id = item.CompanyName }, new { target = "_blank" }) *@
+                            <td>@Html.DisplayFor(modelItem => item.City)</td>
+                            <td>@Html.DisplayFor(modelItem => item.State)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @if (companyCount > companiesPerPage)
+            {
+                <div class="Container">
+                    <i class="fa fa-angle-double-left fa-2x"></i>
+                    <ul class="pagination">
+                        <li class="active paginationLink"><a>1</a></li>
+                        @for (var i = 2; i <= (companyCount - 1) / companiesPerPage + 1 && i <= maxPagesDisplayed; i++)
+                        {
+                            <li class="paginationLink"><a>@i</a></li>
+                        }
+                    </ul>
+                    <i class="fa fa-angle-double-right fa-2x"></i>
+                    <br />
+
+                </div>
+            }
+            <span>Results per page:</span> <select id="jobs-per-page">
+                <option value="10" selected="selected">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="75">75</option>
+                <option value="100">100</option>
+                <option value="999999999">∞</option>
+            </select>
+        </div>
+    </div>
+    <div style="padding:20px;">
+        @if (User.IsInRole("Admin"))
+        {
+            @Html.ActionLink("Back to List", "Admin", "Home")
+        }
+        else
+        {
+            @Html.ActionLink("Back to List", "Index", "Jobs")
+        }
+    </div>
+
+    <script>
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+    </script>
+
+</body>
+</html>
+

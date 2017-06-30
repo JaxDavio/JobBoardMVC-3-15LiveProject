@@ -1,0 +1,252 @@
+﻿@using Microsoft.AspNet.Identity;
+@using JobBoardMVC.Models;
+@using Microsoft.Owin.Security;
+@model LoginViewModel
+
+
+
+@* Login verification: This is a big If Else the purpose of which is to
+    separate the User from the Admin in the login.
+    if administrator, then admin link appears.
+    if anyone else, then dashboard link appears.*@
+@if (Request.IsAuthenticated)
+{
+
+    @*var username = User.Identity.GetUserName();
+    if (username == "administrator@portlandjobboard.com" || username == "admin@jobpdx.com")*@ <!--Old "Admin login condition that does not scaffold very well" - I've commented it out to further test the new implementation"-->
+
+    var userId = User.Identity.GetUserId(); //logged in user is fetched using User.Identity.GetUserId - namespace Microsoft.AspNet.Identity method.
+    var userName = User.Identity.GetUserName();//get logged in users user name
+
+    JobBoardMvcContext db = new JobBoardMvcContext();
+    var role = (from r in db.Roles where r.Name.Contains("Admin") select r).FirstOrDefault(); //RoleId value is obtained for "Admin" role name from 'Entity Framework Identity' in JobBoardMVC database.
+    var users = db.Users.Where(x => x.Roles.Select(y => y.RoleId).Contains(role.Id)).ToList(); // All users with "Admin" role are fetched from the 'Entity Framework Identity' in JobBoardMVC database.
+    var profilePhotoId = db.Photos.FirstOrDefault(x => x.UserId.Equals(userId));
+
+if (users.Find(x => x.Id == userId) != null) //check whether the logged in user exists in the set of returned "Admin" users
+{
+
+
+
+        <nav class="navbar navbar-JobPDX navbar-fixed-top">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#adminNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <span style="color: #f0ad4e;">@Html.ActionLink("JobPDX", "Index", "Jobs", new { area = "" }, new { @class = "navbar-brand" })</span>
+
+            </div>
+            <div class="navbar-collapse collapse" id="adminNavbar">
+                <ul class="nav navbar-nav navbar-left ">
+                    <!-- <li>@*Html.ActionLink("About", "About", "Home")*@</li> -->
+                    <!-- <li>@*Html.ActionLink("Contact", "Contact", "Home")*@</li> -->
+
+                    <!-- Added "Pipe (|) between JobPDX & Admin for aestetics. ActionLink is disabled if clicked" -->
+                    <li>@Html.ActionLink("|", "", "", new { onclick = "javascript:return false;" })</li>
+
+                    <li>@Html.ActionLink("Admin", "Admin", "Home")</li>
+                    <li>@Html.ActionLink("Roles", "Index", "Roles")</li>
+                    <li>@Html.ActionLink("Scrapes", "Index", "Scrapes")</li>
+
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+
+                        <!-- If, else if, else statement: If Admin, UserProfile link disabled, If User, enabled. Else, go to landing -->
+                        <!-- The UserProfile Link is disabled for Admin since we don't have a user profile for Admin -->
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            @Html.ActionLink("Hello " + userName + "!", "UserProfile", "Dashboard", new { onclick = "javascript:return false;" })@*UserProfile disabled if role is Admin*@
+
+                        }
+
+                        else if (Request.IsAuthenticated)
+                        {
+                            @Html.ActionLink("Hello " + userName + "!", "UserProfile", "Dashboard")@*changed to send to user profile*@
+                        }
+
+                        else
+                        {
+                            Response.Redirect("/Home/Index");
+                        }
+
+                        
+                    </li>
+                    <li>
+                        <a href="javascript:document.getElementById('logoutForm').submit()">Sign out</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+        {
+            @Html.AntiForgeryToken()
+        }
+    }
+
+    else
+    {
+        <nav class="navbar navbar-JobPDX navbar-fixed-top">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#userNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <span>@Html.ActionLink("JobPDX", "Index", "Jobs", new { area = "" }, new { @class = "navbar-brand" })</span>
+                <!--Html.ActionLink is a MVC .NET Helper Method -- parameters:
+                    "Display name/markup text",
+                    "Action name/View File"
+                    "Controller name"-->
+            </div>
+            <div class="navbar-collapse collapse" id="userNavbar">
+                <ul class="nav navbar-nav navbar-left">
+                    <!-- <li>@*Html.ActionLink("About", "About", "Home")*@</li> -->
+                    <!-- <li>@*Html.ActionLink("Contact", "Contact", "Home")*@</li> -->
+                    <li>@Html.ActionLink("Dashboard", "Index", "Dashboard")</li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+
+                        <!-- If, else if, else statement: If Admin, UserProfile link disabled, If User, enabled. Else, go to landing -->
+                        <!-- The UserProfile Link is disabled for Admin since we don't have a user profile for Admin -->
+                     @* @if (User.IsInRole("Admin"))*@
+                     @*  { *@
+                        @*<a href="@Url.Action("UserProfile","Dashboard")">Hello! &nbsp;<img src="../images/DefaultProfilePic.png" height="22" width="22"text-align:center/ ></a>
+                         } *@
+                            @if (Request.IsAuthenticated)
+                            {
+                                @*<a href="@Url.Action("UserProfile","Dashboard")">Hello! &nbsp;<img src="~/images/DefaultProfilePic.png" alt="../images/DefaultProfilePic.png" height="22" width="22"></a>*@
+                                <a href="@Url.Action("UserProfile","Dashboard")"><img src="~/Dashboard/RetrieveProfilePhoto?id=@profilePhotoId.FileId" alt="../images/DefaultProfilePic.png" height="30" width="30"></a>
+                                //Trying to render an image from database with the unique userId#...I had been using my own unique Id#; however, that's as far as I could figure out.
+                                    @* ALSO HAVE TRIED THIS CODE: <a href="@Url.Action("UserProfile","Dashboard")">Hello! &nbsp;<img src="@Url.Content(ProfilePhoto.RetrieveProfilePhoto)" /></a>*@
+                            }
+
+                            else
+                            {
+                                Response.Redirect("/Home/Index");
+                            }
+
+
+                    </li>
+                    <li>
+                        <a href="javascript:document.getElementById('logoutForm').submit()">Sign out</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+            using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+            {
+            @Html.AntiForgeryToken()
+        }
+    }
+
+}
+
+// Condition for non-authenticated
+
+else
+{
+    <nav class="navbar navbar-JobPDX navbar-fixed-top">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#guestNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <span>@Html.ActionLink("JobPDX", "Index", "Jobs", new { area = "" }, new { @class = "navbar-brand" })</span>
+        </div>
+        <div class="navbar-collapse collapse" id="guestNavbar">
+            <ul class="nav navbar-nav navbar-left">
+                <!--<li>@*Html.ActionLink("About", "About", "Home")*@</li> -->
+                <!--<li>@*Html.ActionLink("Contact", "Contact", "Home")*@</li> -->
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>@Html.ActionLink("Create your Account!", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+                <li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><b>Sign in</b> <span class="caret"></span></a>
+					<ul id="login-dp" class="dropdown-menu">
+						<li>
+							<div class="row">
+								<div class="col-md-12 text-center">
+									<section id="socialLoginForm" class="text-center">
+									@{
+										var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
+										using (Html.BeginForm("ExternalLogin", "Account", new { ReturnUrl = ViewBag.ReturnUrl }))
+										{
+											@Html.AntiForgeryToken()
+											<div id="socialLoginList">
+												<p>
+													@foreach (AuthenticationDescription p in loginProviders)
+													{
+														if (p.Caption == "Google")
+														{
+															<button type="submit" class="btn btn-default" id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType" title="Log in using your @p.Caption account"><img src="~/images/btn_google_signin_dark_normal_web.png" /></button>
+														}
+														else
+														{
+															<button type="submit" class="btn btn-primary" id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType" title="Log in using your @p.Caption account">Sign in with @p.AuthenticationType</button>
+														}
+													}
+												</p>
+											</div>
+										}
+									}
+									</section>
+									<hr />
+									Or Sign in with:
+									<section id="loginForm">
+										@using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+										{
+											<!-- Throwing an error after logging out only (suppressing xframeoptions fixes for now...) -->
+											@Html.AntiForgeryToken() 
+											@* took this out because validation already directs user to separate sign-in or register pages:
+												@Html.ValidationSummary(true, "", new { @class = "text-danger" })*@
+											<div class="form-group emailpass">
+												@*@Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label sr-only" })*@
+												<div class="input-group">
+													<span class="input-group-addon glyphicon glyphicon-user"></span>
+													@Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Email Address" })
+													@Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+												</div>
+											</div>
+											<div class="form-group emailpass">
+												@*@Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label sr-only" })*@
+												<div class="input-group">
+													<span class="input-group-addon glyphicon glyphicon-lock"></span>
+													@Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password" })
+													@Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+												</div>
+											</div>
+											<div class="form-group">
+												<div class="">
+													<div class="checkbox-inline" style="color: #f0ad4e;">
+														@Html.CheckBoxFor(m => m.RememberMe)
+														@Html.LabelFor(m => m.RememberMe)
+													</div>
+													<input type="submit" value="Sign in" class="btn btn-primary" style="margin-left:10px;font-size:16px;padding:5px 15px;" />
+												</div>
+											</div>
+
+											@* Enable this once you have account confirmation enabled for password reset functionality
+											<p>
+												@Html.ActionLink("Forgot your password?", "ForgotPassword")
+											</p>*@
+
+										}
+									</section>
+									<div class="bottom text-center">
+										@Html.ActionLink("Register as a new user", "Register")
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</li>
+            </ul>
+        </div>
+    </nav>
+}

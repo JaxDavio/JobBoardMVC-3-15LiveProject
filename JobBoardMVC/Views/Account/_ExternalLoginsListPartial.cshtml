@@ -1,0 +1,25 @@
+﻿@model JobBoardMVC.Models.ExternalLoginListViewModel
+@using Microsoft.Owin.Security
+
+@{
+	var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
+	using (Html.BeginForm("ExternalLogin", "Account", new { ReturnUrl = Model.ReturnUrl }))
+	{
+        @Html.AntiForgeryToken()
+        <div id="socialLoginList">
+            <p>
+                @foreach (AuthenticationDescription p in loginProviders)
+				{
+					if (p.Caption == "Google")
+					{
+						<button type="submit" class="btn btn-default" id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType" title="Log in using your @p.Caption account"><img src="~/images/btn_google_signin_dark_normal_web.png" /></button>
+					}
+					else
+					{
+						<button type="submit" class="btn btn-primary" id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType" title="Log in using your @p.Caption account">Sign in with @p.AuthenticationType</button>
+					}
+				}
+            </p>
+        </div>
+	}
+}

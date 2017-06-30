@@ -1,0 +1,203 @@
+﻿@model JobBoardMVC.Models.JobLocationViewModel
+@{
+
+    ViewBag.Title = "Home";
+    Layout = "../Shared/_Layout.cshtml";
+
+    @* Global variables *@
+int jobCount = ViewBag.Counts; @*Returns count of currently listed jobs, see JobsController.cs*@
+int jobID = ViewBag.JobID;
+int maxPagesDisplayed = 5; @* This var should always equal the JS var with the same name *@
+int jobsPerPage = 10;
+int companyCount = ViewBag.companyCount; @*Returns count of currently listed companies, see JobsController.cs*@
+var usersSavedJobIDs = ViewBag.UsersSavedJobIDs; @*List of job Ids the current user has saved*@
+}
+
+@*This is the Authenticated home page*@
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<style>
+    .body-content {
+        background-color: rgba(255,255,255,0);
+    }
+    .col-centered {
+        float: none;
+        margin: 0 auto;
+    }
+</style>
+@* Render partial view containing modal that indicates successful save*@
+
+@{
+    Html.RenderPartial("~/Views/Shared/_PartialSaveJobModal.cshtml");
+}
+
+<!-- If user is logged-in, then Search Bar is displayed, else redirected to /Home/Index Landing Page
+    Note: The intent is that a Non-Authenticated User cannot browse our database. Also, we do not want
+    other websites scraping our data.-->
+
+@if (Request.IsAuthenticated)
+{
+
+    <!-- Commented out search-wrapper div.
+        Caused the search bar to behave weirdly whilst scrolling in mobile form. -->
+    <!--Commenting out the search-wrapper has disabled the JavaScript to animate the search bar.
+        The script targets the search-wrapper tag.-->
+    <!--<div id="search-wrapper">-->
+    
+    @*<input onclick="restyleTitleSearch()" id="TitleSearch" type="text" name="jobTitleString" class="form-control"
+    placeholder = "Search @jobCount jobs at @companyCount companies..." /> @* Displays actual number of jobs and companies within text*@
+        <!--</div>-->
+
+
+
+    <div style="margin-top: 15px; text-align: center; padding-bottom: 15px;">
+        <form id="search-wrapper" class="admin-search-wrapper">
+            <div class="row">
+                <div class="col-lg-4 col-centered">
+                    <div class="input-group">
+                        <input onclick="restyleTitleSearch()" id="TitleSearch" type="text" name="jobTitleString" class="form-control" placeholder="Search @jobCount jobs at @companyCount companies..." id="TitleSearch" />
+                        <div class="input-group-btn">
+                            <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-search"></span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+
+}
+
+else
+
+{
+    Response.Redirect("/Home/Index");
+}
+
+<!--link to all companies view-->
+<div id="AllCompaniesLink">
+    <a href="@Url.Action("Index", "AllCompanies")"> View All Companies</a>
+</div>
+
+
+
+<table class="table table-hover table-responsive tablesorter job-table" id="job-listings-table">
+    <thead>
+        <tr>
+
+            <th class="headerName">@Html.DisplayNameFor(model => model.jobs[0].CompanyCompanyName)</th>
+            <th class="headerDate">@Html.DisplayNameFor(model => model.jobs[0].DatePosted)</th>
+            <th class="headerTitle">@Html.DisplayNameFor(model => model.jobs[0].JobTitle)</th>
+            <th class="headerLocation">@Html.DisplayNameFor(model => model.jobs[0].Location)</th>
+            <th>Save Job</th>
+            <th>@Html.DisplayNameFor(model => model.jobs[0].ApplicationLink)</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.jobs.Any())
+        {
+            foreach (var item in Model.jobs)
+            {
+                <tr>
+                    <!-- <td> tags must have no whitespace -->
+                    <td class="tableName">
+                        <a data-toggle="tooltip" data-placement="right"
+                           title="@Html.DisplayFor(modelItem => item.Company.Description)"
+                           href="@Url.Action("Details", "CompanyInfo", new { id = item.CompanyCompanyName })">@item.CompanyCompanyName</a>
+                        @*@Html.ActionLink(item.CompanyCompanyName,"Details", "CompanyInfo", new { id = item.CompanyCompanyName }, new { target = "_blank" })*@
+                    </td>
+                    <td class="tableDate">@Html.DisplayFor(modelItem => item.DatePosted)</td>
+                    <td class="tableTitle">@Html.DisplayFor(modelItem => item.JobTitle)</td>
+                    <td class="tableLocation">@Html.DisplayFor(modelItem => item.Location)</td>
+                        @if (usersSavedJobIDs != null
+                            && usersSavedJobIDs.Contains(item.JobID))
+                        { <td class="text-center">Saved <i class="fa fa-floppy-o fa-lg" style="color:#808080;"></i></td> }
+                        else
+                        { <td class="text-center"><a onclick="SaveJob('@item.ID', this)">Save <i class="fa fa-floppy-o fa-lg" style="color:#da860e;"></i></a></td> }
+                    <td><a href="@item.ApplicationLink" target="_blank">Apply <i class="fa fa-arrow-circle-right fa-lg" style="color:#337ab7"></i></a></td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+@*This is the code for the number of results per page*@
+@if (jobCount > jobsPerPage)
+{
+    <div id="paginationContainer" class="job-pagination">
+        <i class="fa fa-angle-double-left fa-2x"></i>
+        <ul class="pagination">
+            <li class="active paginationLink"><a>1</a></li>
+            @for (var i = 2; i <= (jobCount - 1) / jobsPerPage + 1 && i <= maxPagesDisplayed; i++)
+            {
+                <li class="paginationLink"><a>@i</a></li>
+            }
+        </ul>
+        <i class="fa fa-angle-double-right fa-2x"></i>
+        <br />
+        <span style="color:#fff;">Results per page:</span> <select id="jobs-per-page">
+            <option value="5">5</option>
+            <option value="10"selected="selected">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="999999999">∞</option>
+        </select>
+    </div>
+}
+@*
+@foreach (var item in Model.CompanyDescription)
+{
+    <p> @item.Name<br>
+    @item.Description </p>
+}
+*@
+
+<script src="~/Scripts/jquery-3.1.1.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+
+<script>
+    function restyleTitleSearch(){
+    document.getElementById("TitleSearch").placeholder=("");
+    document.getElementById("TitleSearch").style=("text-align: left");
+    }
+</script>
+
+@* Script to call save action and load save modal. Also disables button *@
+<script type="text/javascript" language="javascript">
+    function SaveJob(id, trigger) {
+        $(trigger).text("Saved")
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Save", "Jobs")?jobId=' + id,
+                success: function () {
+                    $("#saveJobModal").modal('show'); //pop in modal
+                    $("#saveJobModal").delay(2000).fadeOut(500); //2 second before fade out, fading last 0.5 sec
+                    setTimeout(function () {
+                        $("#saveJobModal").modal('hide'); // after fade is done hide modal completely
+                    }, 2500);// 3 seconds, total time modal is displayed
+                }
+        });
+
+    }
+
+</script>
+@* I don't think this is necessary any more
+        <script>
+
+            $(document).ready(function () {
+             //    If this window was opened by another window, as in the case where a user is prompted
+               // to log in from the company details page, reload that page
+            opener.location.reload(true);
+        });
+    </script>
+*@
+

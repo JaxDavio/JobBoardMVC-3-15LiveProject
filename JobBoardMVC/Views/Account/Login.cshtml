@@ -1,0 +1,146 @@
+﻿@using JobBoardMVC.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Log in";
+    Layout = "../Shared/_Layout.cshtml";
+}
+
+<style>
+	.body-content {
+		background-color: rgba(255,255,255,0);
+	}
+
+	.form-title {
+		color: #555;
+		font-size: 18px;
+		font-weight: 500;
+		display: block;
+	}
+
+	.form-register {
+		max-width: 330px;
+		padding: 15px;
+		margin: 0 auto;
+	}
+
+	.form-register .form-control {
+		position: relative;
+		font-size: 14px;
+		height: auto;
+		width: 100% !important; /* because mobile responsiveness properties make this 88% in Site.css. Must fix later*/
+		padding: 10px;
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+	}
+
+	.form-register .form-control:focus {
+		z-index: 2;
+	}
+
+	.form-horizontal .email, 
+	.form-horizontal .password {
+		margin-right: auto;
+	}
+
+	.form-register input[type="text"] {
+		border-bottom-left-radius: 0;
+		border-bottom-right-radius: 0;
+	}
+
+	.form-register input[type="password"] {
+		border-radius: 0 0 0 0;
+	}
+
+	.canvas {
+		margin-top: 10px;
+		padding: 20px;
+		background-color: rgba(255,255,255,0.9);
+		border-top: 1px solid #eee;
+		-moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+		-webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+		box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+	}
+
+	/*
+
+	- Styles for an image or brand in the registration form...
+
+	.profile-img {
+		width: 96px;
+		height: 96px;
+		margin: 0 auto 10px;
+		display: block;
+		-moz-border-radius: 50%;
+		-webkit-border-radius: 50%;
+		border-radius: 50%;
+		}
+
+	 */
+</style>
+
+<div class="wrapper col-sm-12 col-md-12 formWrapper" style="margin-top:15px">
+
+	<div class="container formContainer" style="font-family: 'Roboto', sans-serif;">
+		<div class="row formRow">
+			<div class="col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4 formBox">
+				<!-- This geometry has to be blended with overall layout -->
+				<div class="canvas">
+					<div id="socialLoginForm" class="text-center">
+						@Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
+					</div>
+					<hr />
+					<h3 class="text-center form-title">Or&nbsp;Sign&nbsp;in&nbsp;with:</h3>
+					@*Render the HTML Registration Form through Html.BeginForm*@
+
+					@using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal loginPage", role = "form" }))
+					{
+						@Html.AntiForgeryToken()
+						@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+						<div class="form-group email">
+							@*@Html.LabelFor(m => m.Email, new { @class = "col-sm-2 control-label sr-only" })*@
+							<div class="input-group">
+								<span class="input-group-addon glyphicon glyphicon-user"></span>
+								@Html.TextBoxFor(m => m.Email, new { @type = "text", @class = "form-control", @placeholder = "Email Address" })
+								@Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+							</div>
+						</div>
+
+						<div class="form-group password">
+							@*@Html.LabelFor(m => m.Password, new { @class = "col-sm-2 control-label sr-only" })*@
+							<div class="input-group">
+								<span class="input-group-addon glyphicon glyphicon-lock"></span>
+								@Html.PasswordFor(m => m.Password, new { @type = "password", @class = "form-control", @placeholder = "Password" })
+								@Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+							</div>
+						</div>
+
+						<div class="form-group text-center">
+							<div class="">
+								<div class="checkbox-inline" style="color:#f0ad4e;">
+									@Html.CheckBoxFor(m => m.RememberMe)
+									@Html.LabelFor(m => m.RememberMe)
+								</div>
+								<input type="submit" class="btn btn-primary" value="Sign in" style="margin-left:20px;font-size:16px;padding:5px 15px;" />
+							</div>
+						</div>
+
+
+					} @*End Form*@
+					<p>
+						@Html.ActionLink("Register as a new user", "Register")
+					</p>
+				</div><!--End canvas -->
+			</div><!--End column center -->
+		</div><!-- End row -->
+	</div><!-- End container -->
+
+</div>
+
+
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

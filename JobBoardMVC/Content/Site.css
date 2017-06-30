@@ -1,0 +1,484 @@
+﻿/*
+    Color Scheme (based on Tech Academy website/bootstrap)
+    Orange: #F0AD4E
+    Blue: #337AB7
+*/
+
+/* body padding-top = 50px for navbar + 25px for beauty. padding-left/right keeps content from touching sides.*/
+body {
+	font-family: 'Roboto', Helvetica Neue, Helvetica, Arial, sans-serif;
+	background: url('../images/computer-chip-1024x681.jpg') no-repeat center;
+	background-size: cover;
+	padding: 75px 15px 20px 15px;
+	min-height: 70vh;
+}
+
+.body-content {
+	min-height: 70vh;
+	background-color: rgba(255,255,255,0.9);
+	margin-bottom: 35px;
+}
+
+/* navbar Style */
+
+.navbar {
+    background-color: #337AB7;
+    font-family: 'Roboto', Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-size: medium;
+    padding: 5px 15px;
+}
+
+.navbar a{ color: white; } /* Set text color */
+
+.navbar span.nolink {
+    color: white;
+    padding: 15px;
+    line-height: 20px;
+    position: relative;
+    display: block;
+}
+
+.nav > li > a:hover, .nav > li > a:focus {
+        background-color: #337AB7; /* Bootstrap default is grey */
+        color: #F0AD4E;
+}
+
+.navbar-JobPDX {
+    font-size:medium;
+}
+
+.navbar-JobPDX .navbar-toggle {
+    border-color: #fff;
+}
+
+.navbar-JobPDX .navbar-toggle:hover,
+.navbar-default .navbar-toggle:focus {
+    background-color: #f89406;
+}
+
+.navbar-JobPDX .navbar-toggle .icon-bar {
+    background-color: #fff;
+}
+
+.navbar-JobPDX .navbar-header .navbar-brand {
+    background: url('../images/JobPDXlogo.png') no-repeat left;
+    background-size: 60px;
+    padding-left: 75px;
+	font-family: 'Rambla', sans-serif;
+	color: #F0AD4E;
+	font-size: 26px;
+	font-weight: bold;
+	text-shadow: 2px 2px 4px #23527e;
+}
+
+.navbar-JobPDX .navbar-header .navbar-brand:hover,
+.navbar-JobPDX .navbar-header .navbar-brand:focus {
+	color: #f89406;
+}
+/* END navbar Style */
+
+
+
+/* Set width on user input fields since they're 100% wide by default. */
+input, select, textarea { max-width: 420px; }
+
+/* Set padding-left to 0 for user input fields since they're next to eachother. padding-top is for mobile users. */
+.form-group-md { padding: 10px 15px 0 0; }
+
+/* Set user input field height to the same height as filter button. */
+.form-control { height: 34px; }
+
+.filtered { display: none !important; }
+
+/***  Search Bar settings ***/
+   /*.search-wrapper {
+    position: relative;
+    height: auto;
+    width: 400px;
+    margin-right: auto;
+    margin-left: auto;
+    text-align: center;
+}*/
+
+    #TitleSearch {
+    position: relative;
+    bottom: 0;
+    text-align: center;
+    padding: 2px;
+    border: 3px solid #F0AD4E;
+    margin: auto;
+   
+}
+
+    #AllCompaniesLink {
+    position: relative;
+    text-align: center;
+    padding: 2px;
+    margin: auto;
+}
+
+/***  End Search Bar settings ***/
+
+/*** Table styles for TableSorter, a JavaScript extension ***/
+table.tablesorter { font-size: 9pt; margin-top: 15px; background-color: rgba(255,255,255,0.9); }
+table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+    background-color: #E6EEEE;
+    border: 1px solid white;
+    padding: 4px;
+    text-align: center;
+    font-size: 14.5px;
+}
+table.tablesorter tbody tr td {
+    text-align: center;
+    font-size: 14px;
+}
+table.tablesorter thead tr .header {
+    background-image: url(bg.gif);
+    background-repeat: no-repeat;
+    background-position: center right;
+    cursor: pointer;
+    padding-right: 15px;
+}
+table.tablesorter thead tr .headerSortUp { background-image: url(asc.gif); }
+table.tablesorter thead tr .headerSortDown { background-image: url(desc.gif); }
+/* Set color of selected column. */
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp { background-color: #75a0c4; }
+table.job-table { display: none;}
+
+/*** End table styles ***/
+
+/* Pagination settings*/
+#paginationContainer { text-align: center; }
+
+#paginationContainer.job-pagination { display: none; }
+
+ul.pagination {
+    margin: auto;
+    padding-bottom: 10px;
+}
+/*** Pagination settings ***/
+
+i {
+    color: #F0AD4E;
+    vertical-align: top;
+    padding-top: 3px;
+}
+i:hover { cursor: pointer; }
+
+/*
+    Stuff that seems useless but I'm scared to delete
+
+    .header { padding-right: 50px; }
+    .dl-horizontal dt { white-space: normal; }
+*/
+
+.dl-horizontal dt {
+    padding-bottom: 10px;
+}
+
+.indenter {
+    padding-left: 85px;
+}
+
+/* Styling for AuthorizeFailed page */
+#access {
+    padding-left: 200px;
+    padding-right: 200px;
+}
+
+#access h1 {
+    text-align: center;
+    color: #ff751a;
+}
+
+#access p {
+    font-size: 16px;
+    padding-top: 10px;
+    text-align: center;
+}
+
+#link {
+    padding-left: 20px;
+}
+
+
+/* footer Style */
+
+footer {
+    background-color: #337AB7; /*Blue*/
+    font-family: 'Roboto', Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-size: small;
+    color: white;
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 0;
+    width: auto;
+    height: auto;
+    padding-top: 15px;
+    z-index: 9999;
+    overflow: hidden;
+    left: 0;
+    right: 0;
+}
+
+footer p {
+        padding: 0.1px 15px 0.1px 10px;
+    }
+
+footer a {
+        color: white;
+        padding: 0.1px 0px 0.1px 10px;
+    }
+
+footer a:hover, footer a:focus {
+        color: #F0AD4E;
+        text-decoration: none; /* Bootstrap default is linethrough? */
+}
+
+
+
+/* Used to create a sticky footer */
+html {
+    font-family: 'Roboto', Helvetica Neue, Helvetica, Arial, sans-serif;
+    position: relative;
+    min-height: 100%;
+}
+
+.body-content {
+    /*margin: 0 0 100px;*/
+    /*padding: 25px;
+    position:relative;*/
+}
+
+#dashboardTitle {
+    position:absolute;
+    font-size:medium;
+    top: 0px;
+}
+
+/* END footer Style */
+
+
+
+
+/* Use to style and position the modal that pops up when you save a job*/
+.modal-content {
+    border-radius: 6px;
+    width: 400px;
+    max-width: 100%;
+    max-height: 100%;
+    margin-top: 50%;
+    transform: translate(-50%, -50%);
+    position: center;
+    left: 50%;
+}
+
+.modal-header {
+    background-color: #337AB7;
+    color: white;
+}
+
+.modal-footer {
+    padding-right: 25px;
+}
+
+.tableContainer {
+    text-align: center
+}
+
+
+.navbar-JobPDX .navbar-toggle .icon-bar:hover,
+.navbar-JobPDX .navbar-toggle .icon-bar:focus {
+    background-color: #888;
+}
+
+a.change-view {
+    display: inline;
+    float: right;
+}
+
+a.disabled {
+    pointer-events: none;
+    background-color: lightgray;
+    border-color: black;
+}
+
+a:hover {
+    cursor: pointer;
+}
+
+
+/* used for keeping searchbar always visible*/
+.fixed-search-div {
+    position: fixed;
+    z-index: 1000 !important;
+    background-color: rgba(255, 255, 255, 1) !important;
+    padding: 0% 23.8% !important;
+    width: 100%;
+    top: 60px !important;
+    height: 55px !important;
+
+}
+
+
+
+.fixed-nav{
+    margin: 0 !important;
+}
+
+.fixed-search{
+    bottom: 13px !important;
+}
+/*Search bar visibility*/
+
+
+/* Google Log-in button*/
+#Google {
+	padding: 0;
+	border:0 solid transparent;
+}
+
+.loginPage {
+	margin-left:20px;
+}
+
+/*Login dropdown*/
+.navbar-nav > li > .dropdown-menu {
+	margin-top: 5px;
+}
+
+.nav .open > a, .nav .open > a:hover, .nav .open > a:focus {
+	background-color: #337ab7;
+	border-color: #337ab7;
+}
+
+
+#login-dp {
+	min-width: 290px;
+	padding: 14px;
+	overflow: hidden;
+	background-color: rgba(255,255,255,.9);
+}
+
+#login-dp .form-group {
+	margin: 10px auto;
+}
+
+
+#login-dp .bottom a{
+	color: #337AB7;
+}
+
+#login-dp .bottom a:hover {
+	color: #23527C;
+	text-decoration: none;
+}
+
+.glyphicon {
+	top: 0;
+}
+/*Login dropdown end*/
+
+/***  ~/Roles/Index.cshtml  ***/
+/*
+  #AdminRoleContainer {}
+  #AdminRoleList {}
+*/
+
+/*Mobile Responsiveness*/
+@media only screen and (max-width: 768px){
+    .footer-center{
+        float:none !important;
+        text-align:center;
+
+    }
+    .pull-right[class~="cancel"] {
+        float:none !important;
+    }
+
+	#login-dp {
+		color: #fff;
+	}
+
+	#login-dp .bottom {
+		border-top: 0 none;
+	}
+	.body-content {
+		margin-right:0 !important;
+	}
+	.navContainer{
+		margin-right:0 !important;
+	}
+	.formContainer {
+		margin-right:0 !important;
+		padding:0;
+	}
+	.formRow {
+		margin:0;
+	}
+	.welcome {
+		margin: auto;
+		margin-bottom: 70px;
+	}
+}
+
+@media only screen and (max-width: 600px){
+    .headerDate{
+        display:none;
+    }
+    .headerLocation{
+        display:none;
+    }
+    .tableDate{
+        display:none;
+    }
+    .tableLocation{
+        display:none;w
+    }
+    .fixed-search-div{
+        padding-left:10% !important;
+        margin-left:0 !important;
+    }
+    .fixed-search {
+        width: 88% !important;
+    }
+    .form-control{
+        width: 88%;
+    }
+
+}
+
+
+@media only screen and (max-width: 400px) {
+    .fixed-search-div {
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+        overflow: hidden;
+    }
+    .body-content{
+        padding-left:0 !important;
+		padding-right:0 !important;
+		margin-bottom:105px;
+    }
+	.formBox {
+		padding-left: 0 !important;
+		padding-right: 0 !important;
+	}
+	.formWrapper {
+		margin-top:0 !important;
+	}
+Search-wrapper {
+		width: 380px ;
+		margin-right: auto ;
+		margin-left:auto;
+        height:200px;
+        overflow:hidden;
+        height: 100%;
+        width: 100%
+	}	
+	.welcome {
+		margin: auto;
+	}
+}
+
+/*Mobile Responsiveness*/

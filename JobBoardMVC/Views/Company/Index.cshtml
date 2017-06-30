@@ -1,0 +1,40 @@
+﻿@model IEnumerable<JobBoardMVC.Models.Company>
+
+@{
+    ViewBag.Title = "CompanyInfo";
+}
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<h2>Company Information</h2>
+
+<table class="table table-hover table-responsive">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.CompanyLink)</th>
+            <th>@Html.DisplayNameFor(m => m.Address)</th>
+            <th>@Html.DisplayNameFor(m => m.City)</th>
+            <th>@Html.DisplayNameFor(m => m.State)</th>
+            <th>@Html.DisplayNameFor(m => m.ZipCode)</th>
+            <th>@Html.DisplayNameFor(m => m.Latitude)</th>
+            <th>@Html.DisplayNameFor(m => m.Longitude)</th>
+            <th>@Html.DisplayNameFor(m => m.CareerPage)</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var i in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(Model => i.CompanyLink)</td>
+                <td>@Html.DisplayFor(Model => i.Address)</td>
+                <td>@Html.DisplayFor(Model => i.City)</td>
+                <td>@Html.DisplayFor(Model => i.State)</td>
+                <td>@Html.DisplayFor(Model => i.ZipCode)</td>
+                <td>@Html.DisplayFor(Model => i.Latitude)</td>
+                <td>@Html.DisplayFor(modelItem => i.Longitude)</td>
+                <td>@Html.DisplayFor(modelItem => i.CareerPage)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script src="~/Scripts/jquery-3.1.1.min.js"></script>

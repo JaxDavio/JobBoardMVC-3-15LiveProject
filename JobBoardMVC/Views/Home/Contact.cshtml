@@ -1,0 +1,180 @@
+﻿@model JobBoardMVC.Models.ContactFormModel
+@{
+    ViewBag.Title = "Contact";
+}
+
+
+<h2>@ViewBag.Title</h2>
+
+<style>
+    .embed-container {
+        position: relative;
+        padding-bottom: 56.25%;
+        margin-bottom: 10px;
+        height: 0;
+        overflow: hidden;
+        max-width: 100%;
+    }
+
+        .embed-container iframe, .embed-container object, .embed-container embed {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6">
+           
+            <h3>@ViewBag.Message</h3>
+            <address>
+                310 SW 4th Ave #412<br />
+                Portland, OR 97204<br />
+                <abbr title="Phone">P:</abbr>
+                503.206.6915
+            </address>
+          
+            <div class='embed-container' id="map">
+                <!--Embedded map-->
+                <!--
+        <div class='embed-container'>
+            <iframe src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2795.4649013622006!2d-122.6770446844406!3d45.52084937910168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x54950a0684247fe3%3A0x5da36c0a845cc351!2s310+SW+4th+Ave+%23412%2C+Portland%2C+OR+97204!5e0!3m2!1sen!2sus!4v1491695976427' width='600' height='450' frameborder='0' style='border:0' allowfullscreen></iframe>
+        </div>
+         -->
+            </div>
+            <script>
+
+                    function initMap() {
+                        var geocoder = new google.maps.Geocoder();
+                        var map = new google.maps.Map(document.getElementById('map'), {
+                            zoom: 8
+                        });
+                        geocodeAddress(geocoder, map);
+                    }
+                  
+                    function CenterControl(controlDiv, map, centerspot) {
+
+                        // Set CSS for the control border.
+                        var controlUI = document.createElement('div');
+                        controlUI.style.backgroundColor = '#fff';
+                        controlUI.style.border = '2px solid #fff';
+                        controlUI.style.borderRadius = '3px';
+                        controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+                        controlUI.style.cursor = 'pointer';
+                        controlUI.style.marginBottom = '22px';
+                        controlUI.style.textAlign = 'left';
+                        controlUI.title = 'Click to recenter the map';
+                        controlDiv.appendChild(controlUI);
+
+                        // Set CSS for the control interior.
+                        var controlText = document.createElement('div');
+                        controlText.style.color = 'rgb(25,25,25)';
+                        controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+                        controlText.style.fontSize = '12px';
+                        controlText.style.lineHeight = '18px';
+                        controlText.style.paddingLeft = '5px';
+                        controlText.style.paddingRight = '5px';
+                        controlText.innerHTML = '<strong>JobPDX</strong><br>310 SW 4th Ave #412<br>Portland, OR 97204<br>';
+                        controlUI.appendChild(controlText);
+
+                        // Setup the click event listeners: simply set the map to center back at the company address.
+                        controlUI.addEventListener('click', function () {
+                            map.setCenter(centerspot);
+                        });
+
+                    }
+
+                    function geocodeAddress(geocoder, resultsMap) {
+                        var address = "310 SW 4th Ave #412 Portland OR,97204";
+                        var jobpdxmarker = "../../images/JobPDXmarker.png"
+                        geocoder.geocode({ 'address': address }, function (results, status) {
+                            if (status === 'OK') {
+                                var convertedaddress = results[0].geometry.location
+                                resultsMap.setCenter(convertedaddress);
+                                resultsMap.setZoom(15);
+                                var marker = new google.maps.Marker({
+                                    map: resultsMap,
+                                    position: convertedaddress,
+                                    icon: jobpdxmarker
+                                });
+
+                                // Create the DIV to hold the control and call the CenterControl()
+                                // constructor passing in this DIV.
+                                var centerControlDiv = document.createElement('div');
+                                var centerControl = new CenterControl(centerControlDiv, resultsMap, convertedaddress);
+
+                                centerControlDiv.index = 1;
+                                resultsMap.controls[google.maps.ControlPosition.TOP_RIGHT].push(centerControlDiv);
+
+                            }
+
+                            else {
+                                alert('Geocode was not successful for the following reason: ' + status);
+                            }
+                        });
+                    }
+
+            </script>
+
+            <!-- This API Key needs to be replaced with one obtained by the client.  Current key is a personal API from a Tech Academy student. -->
+            <script async defer
+                    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJXWe9gnpmgclIWOshOjGV_i5gUV--x_Q&callback=initMap">
+            </script>
+            </div>
+        <div class="col-sm-5 col-sm-offset-1">
+
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group row">
+                    <div class="col-xs-10">
+                        <h3>Contact us.</h3>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-xs-10">
+                        @Html.LabelFor(m => m.FromName, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.FromName, new { @class = "form-control", @placeholder = "Full name required", @type = "text" })
+                        @Html.ValidationMessageFor(m => m.FromName)
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-xs-10">
+                        @Html.LabelFor(m => m.FromEmail, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.FromEmail, new { @class = "form-control", @placeholder = "Email address required", @type = "text" })
+                        @Html.ValidationMessageFor(m => m.FromEmail)
+                    </div>
+                </div>
+                <div class="form-group row">
+
+                    <div class="col-xs-10">
+                        @Html.LabelFor(m => m.PhoneNumber, new { @class = "control-label" })
+                        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", @placeholder = "Phone number optional", @type = "text" })
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-xs-10">
+                        @Html.LabelFor(m => m.Message, new { @class = "control-label" })
+                        @Html.TextAreaFor(m => m.Message, new { @class = "form-control", @placeholder = "Type your message here", @type = "text" })
+                        @Html.ValidationMessageFor(m => m.Message)
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-xs-10" style="color:#36A0FF">
+                        <input type="submit" class="btn btn-primary" value="Send" />
+                    </div>
+                </div>
+            }
+            </div>
+    </div>
+</div>
+
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

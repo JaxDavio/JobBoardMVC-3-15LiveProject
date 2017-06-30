@@ -1,0 +1,136 @@
+﻿@using System;
+@using System.Collections.Generic;
+@using System.Data;
+@using System.Data.Entity;
+@using System.Linq;
+@using System.Threading.Tasks;
+@using System.Net;
+@using System.Web;
+@using System.Web.Mvc;
+@using JobBoardMVC.Models;
+@using System.Data.Entity.Migrations;
+@using JobBoardMVC.CustomFilters;
+@using Microsoft.AspNet.Identity;
+
+@model JobBoardMVC.Models.JobLocationViewModel
+
+@{
+
+	ViewBag.Title = "Home";
+	Layout = "../Shared/_Layout.cshtml";
+
+@* Global variables *@
+int jobCount = ViewBag.Counts; @*Returns count of currently listed jobs, see HomeController.cs* (non-authenticated section)*@
+int companyCount = ViewBag.companyCount; @*Returns count of currently listed companies, see HomeController.cs(non-authenticated section)*@
+	// Determine if Administrator, See _LoginPartial.cshtml
+	var userName = User.Identity.GetUserName(); //get logged in users user name
+	var userId = User.Identity.GetUserId(); //logged in user is fetched using User.Identity.GetUserId - namespace Microsoft.AspNet.Identity method.
+	JobBoardMvcContext db = new JobBoardMvcContext();
+	var role = (from r in db.Roles where r.Name.Contains("Admin") select r).FirstOrDefault(); //RoleId value is obtained for "Admin" role name from 'Entity Framework Identity' in JobBoardMVC database.
+	var users = db.Users.Where(x => x.Roles.Select(y => y.RoleId).Contains(role.Id)).ToList(); // All users with "Admin" role are fetched from the 'Entity Framework Identity' in JobBoardMVC database.
+    @var profilePhotoId = db.Photos.FirstOrDefault(x => x.UserId.Equals(userId));
+}
+<style>
+	.body-content {
+		background-color: rgba(255,255,255,0);
+	}
+
+	.welcome {
+		background-color: rgba(255,255,255,0.9);
+		max-width: 700px;
+		min-height: 350px;
+		margin: 30px auto 100px auto;
+		padding: 5%;
+	}
+
+    h2 {
+        font-family: 'Rambla', sans-serif;
+        font-size: 60px;
+        color: #F0AD4E;
+        text-shadow: 2px 2px 4px #23527e;
+        margin: -24px auto 54px auto;
+    }
+</style>
+<!-- This is the Landing Page, /Home/Index.cshtml View.  A nicer Landing page can be built from here -->
+
+<!-- Cookie Saved Password Log-ins: 
+        The AntiForgeryToken code will not allow a startup re-direct from a cookie saved password, 
+            i.e. 'Response.Redirect("/Jobs/Index");' will not work. It causes a run-time error.
+        However, it will allow a cookie saved password to the /Home/Index.cshtml view and the user is recognized as logged-in.
+        When the user clicks on a link, the token re-validates and allows authenticated website use all done very smoothly. As a result
+        we have a nice locked-down website. You are welcome to try and fix this without removing the "AntiForgeryToken Code"-->
+
+<!-- "if, else if, else" statement to determine to show /Home/Index Landing customized based on user: 
+        Administrator, Authenticated User, or Non-Authenticated.
+        Users with a cookie saved password are recognized and logged in.-->
+
+@if (users.Find(x => x.Id == userId) != null)
+{
+        <div class="container-fluid welcome text-center">
+			<h2>Welcome back, Administrator.</h2>
+        </div>
+}
+
+
+else if (Request.IsAuthenticated)
+{
+        <div class="container-fluid welcome text-center">
+            @*<h2>Welcome back, <img src="~/images/DefaultProfilePic.png" height="150" /> @userName!</h2>*@
+            <h2>Welcome back, <img src="~/Dashboard/RetrieveProfilePhoto?id=@profilePhotoId.FileId" height="150" /> @userName!</h2>    <!-- WELCOME BACK ... [img]-->
+			<br />
+			<h3>There are <span style="font-weight:bold;color:#23527e">@jobCount</span> jobs available and <span style="font-weight:bold;color:#23527e">@companyCount</span> companies hiring.</h3>
+
+            <h3>Click here to continue your search: <a href="/Jobs/Index" id="Link">JobPDX</a></h3>
+
+        </div>
+
+}
+
+else
+{
+
+        <div class="container-fluid welcome text-center">
+
+            <h2>Welcome to JobPDX</h2>
+			<br />
+            <h3>There are <span style="font-weight:bold;color:#23527e">@jobCount</span> jobs available and <span style="font-weight:bold;color:#23527e">@companyCount</span> companies hiring.</h3>
+
+                <br />
+			<h3><a href="/Account/Register" id="registerLink">Sign Up</a> and find yours now!</h3>
+
+
+        </div>
+}
+
+<div id="myCarousel" class="carousel slide" data-ride="carousel" style="background-color:gainsboro;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="carousel-inner">
+
+                    @{
+
+                        var i = 0;
+                        foreach (var logo in db.CompanyFiles.Include(x => x.Company))
+                        {
+                            var itemClass = i++ == 0 ? "item active" : "item";
+						<!-- item -->
+                            <div class="@itemClass">
+                                <a href=@logo.Company.CompanyLink target="_blank">
+                                    <img src='@Url.Action("Index", "CompanyInfo", new { id = logo.FileId })' alt="@logo.CompanyName logo" class="img-responsive" style="margin:10px auto;height:100px;max-width:300px;"
+                                </a>
+                            </div>
+
+						<!-- end item -->
+                        }
+                    }
+                </div><!-- end carousel inner -->
+
+            </div>
+
+            @*<a align="center" class="input-group-addon" href="http://google.com"><span title="Company Page"class="glyphicon glyphicon-info-sign"></span></a>*@
+            <a class="left carousel-control" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
+            <a class="right carousel-control" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
+        </div>
+    </div>
+</div><!-- end carousel -->

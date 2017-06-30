@@ -1,0 +1,355 @@
+﻿@model JobBoardMVC.Models.CompanyViewModel
+
+@{
+    ViewBag.Title = Model.company.CompanyName;
+    var usersSavedJobIDs = ViewBag.UsersSavedJobIDs;
+    Layout = "../Shared/_CompanyLayout.cshtml";
+}
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Rambla:700i" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<style>
+    .container {
+        font-family: 'Roboto', Helvetica Neue, Helvetica, Arial, sans-serif;
+        font-size: 15px;
+    }
+    .embed-container {
+        position: relative;
+        padding-bottom: 56.25%;
+        margin-bottom: 10px;
+        height: 0;
+        overflow: hidden;
+        max-width: 100%;
+    }
+
+    .embed-container iframe, .embed-container object, .embed-container embed {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    .body-content {
+        background-color: rgba(255,255,255,0.9);
+    }
+    .companyInfo, .map, .jobs {
+        font-family: 'Rambla', sans-serif;
+        color: #F0AD4E;
+        font-size: 28px;
+        font-weight: 900;
+        text-shadow: 2px 2px 3px #23527e;
+    }
+
+    #map {
+        height: 100%;
+    }
+</style>
+
+@* Render partial views containing modals that indicate successful saves*@
+
+@{ 
+    Html.RenderPartial("~/Views/Shared/_PartialSaveCompanyModal.cshtml");
+    Html.RenderPartial("~/Views/Shared/_PartialSaveJobModal.cshtml");
+}
+
+<div class="container" style="padding-right: 45px;">
+    <div class="row">
+        <div class="col-lg-6">
+			@if (Model.company.Files.Any(f => f.FileType == JobBoardMVC.Models.FileType.Logo))
+			{
+				<img style="margin-top:20px;max-height:120px;max-width:300px;vertical-align:top" src="~/CompanyInfo?id=@Model.company.Files.First(f => f.FileType == JobBoardMVC.Models.FileType.Logo).FileId" alt="Company Logo" />
+			}
+				<address style="display:inline-block;margin:20px 0 0 15px;">
+					@{ 
+						var location = Model.company.State;
+						if (location == "OR") { location = "Oregon"; }
+						else if (location == "WA") { location = "Washington"; }
+					}
+					<strong>@location  Location</strong><br />
+					@Model.company.Address<br />
+					@(Model.company.City), @Model.company.State @Model.company.ZipCode <br />
+				</address>
+            <h3>
+                @*@Model.company.CompanyName*@
+                @{ 
+                    var disable = "";
+                    if (Model.companySaved)
+                    {
+                        disable = "disabled";
+                    }
+                }
+				@if (!User.IsInRole("Admin"))
+				{
+					<a onclick="SaveCompany('@Model.company.CompanyName', this)" class="button btn btn-primary @disable">Save</a>
+				}
+				@if (User.IsInRole("Admin"))
+				{
+					@Html.ActionLink("Edit", "Edit", "CompanyInfo", new { id = Model.company.CompanyName }, new { @class = "btn btn-primary" })
+				}
+            </h3>
+            <div style="margin-bottom:30px;">
+				<h4 class="companyInfo"><strong>@Model.company.CompanyName Info</strong></h4>
+
+				<p style="white-space:pre-line;"><strong>Company Type:</strong> </p>
+
+				<p style="white-space:pre-line;"><strong>Industry Served:</strong> </p>
+
+				<p style="white-space:pre-line;"><strong>Languages Used:</strong> </p>
+
+				<p style="white-space:pre-line;"><strong>Categories:</strong> @Model.company.Categories</p>
+
+				<p style="white-space:pre-line;"><strong>Description:</strong> @Model.company.Description</p>
+
+			</div>
+
+			<h4 class="mapbox jobs"><strong>Location</strong></h4>
+
+            @*make some maps*@
+            @if (Model.company.Address == null && Model.company.Latitude == null)
+            {
+                <h4>Oops, No address information available for @Model.company.CompanyName</h4>
+                <div class='embed-container' id="map">
+                    <!--<iframe width="600" height="450" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/view?zoom=10&center=45.5231%2C-122.6765&key=AIzaSyA6O2J7lLtKhM07LikVvEf_5BEOuLhNl80" allowfullscreen></iframe>
+                    -->               
+                </div>
+
+                <script>
+                    function initMap() {
+                        var map = new google.maps.Map(document.getElementById('map'), {
+                            zoom: 8,
+                            center: {lat: 45.5231, lng: -122.6765}
+                        });
+                    }
+
+                </script>
+                // This API Key needs to be replaced with one obtained by the client.  Current key is a personal API from a Tech Academy student.
+                <script async defer
+                        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJXWe9gnpmgclIWOshOjGV_i5gUV--x_Q&callback=initMap">
+                </script>
+            }
+            @*map made from lat lng with marker at location*@
+            @if (Model.company.Address == null && Model.company.Latitude != null && Model.company.Longitude != null)
+            //use Lat Long to a simple map with marker, but with no directions available.
+            {
+                var latitude = Model.company.Latitude;
+                var longitude = Model.company.Longitude;
+
+                <div class='embed-container' id="map">
+                    <!-- <iframe width="600" height="450" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/view?zoom=10&center=45.5231%2C-122.6765&key=AIzaSyA6O2J7lLtKhM07LikVvEf_5BEOuLhNl80" allowfullscreen></iframe>
+                    -->
+                </div>
+
+                <script>
+                    function initMap() {
+                        var map = new google.maps.Map(document.getElementById('map'), {
+                            zoom: 8,
+                            center: {lat: @Decimal.Parse(latitude), lng: @Decimal.Parse(longitude)}
+                        });
+                    }
+
+                </script>
+                // This API Key needs to be replaced with one obtained by the client.  Current key is a personal API from a Tech Academy student.
+                <script async defer
+                        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJXWe9gnpmgclIWOshOjGV_i5gUV--x_Q&callback=initMap">
+                </script>
+
+
+            }
+            @*map made from address, calling embedded map with direction and other advanced functionality*@
+            @if (Model.company.Address != null) //use address to get map
+            {
+                var name = Model.company.CompanyName;
+                var address = Model.company.Address;
+                var cleanAddress = Model.company.Address.Replace(' ', '+');
+                var city = Model.company.City;
+                var state = Model.company.State;
+                var zip = Model.company.ZipCode;
+                <div class='embed-container' id="map">
+                   <!-- If you want to enable the old, custom map, un-comment the below iframe and remove the div id "map" for this div -->
+                   <!--<iframe width="600" height="450" frameborder="0" style="border:0"
+                            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyA6O2J7lLtKhM07LikVvEf_5BEOuLhNl80&q=@cleanAddress+@city+@state,@zip&zoom=10" width='600' height='450' frameborder='0' style='border:0' allowfullscreen></iframe>
+                   -->
+                        
+                </div>
+                <script>
+
+                    function initMap() {
+                        var geocoder = new google.maps.Geocoder();
+                        var map = new google.maps.Map(document.getElementById('map'), {
+                            zoom: 8
+                        });
+                        geocodeAddress(geocoder, map);
+                    }
+
+                    function CenterControl(controlDiv, map, centerspot) {
+
+                        // Set CSS for the control border.
+                        var controlUI = document.createElement('div');
+                        controlUI.style.backgroundColor = '#fff';
+                        controlUI.style.border = '2px solid #fff';
+                        controlUI.style.borderRadius = '3px';
+                        controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+                        controlUI.style.cursor = 'pointer';
+                        controlUI.style.marginBottom = '22px';
+                        controlUI.style.textAlign = 'left';
+                        controlUI.title = 'Click to recenter the map';
+                        controlDiv.appendChild(controlUI);
+
+                        // Set CSS for the control interior.
+                        var controlText = document.createElement('div');
+                        controlText.style.color = 'rgb(25,25,25)';
+                        controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+                        controlText.style.fontSize = '12px';
+                        controlText.style.lineHeight = '18px';
+                        controlText.style.paddingLeft = '5px';
+                        controlText.style.paddingRight = '5px';
+                        controlText.innerHTML = '<strong>@name</strong><br>@address<br>@city.ToString(), @state @zip<br>';
+                        controlUI.appendChild(controlText);
+
+                        // Setup the click event listeners: simply set the map to center back at the company address.
+                        controlUI.addEventListener('click', function () {
+                            map.setCenter(centerspot);
+                        });
+
+                    }
+
+                    function geocodeAddress(geocoder, resultsMap) {
+                        var address = "@address @city @state,@zip";
+                        var jobpdxmarker = "../../images/JobPDXmarker.png"
+                        geocoder.geocode({ 'address': address }, function (results, status) {
+                            if (status === 'OK') {
+                                var convertedaddress = results[0].geometry.location
+                                resultsMap.setCenter(convertedaddress);
+                                resultsMap.setZoom(15);
+                                var marker = new google.maps.Marker({
+                                    map: resultsMap,
+                                    position: convertedaddress,
+                                    icon: jobpdxmarker
+                                });    
+
+                                // Create the DIV to hold the control and call the CenterControl()
+                                // constructor passing in this DIV.
+                                var centerControlDiv = document.createElement('div');
+                                var centerControl = new CenterControl(centerControlDiv, resultsMap, convertedaddress);
+
+                                centerControlDiv.index = 1;
+                                resultsMap.controls[google.maps.ControlPosition.TOP_RIGHT].push(centerControlDiv);
+
+                            }
+
+                            else {
+                                alert('Geocode was not successful for the following reason: ' + status);
+                            }
+                        });
+                    }
+
+                </script>
+
+                // This API Key needs to be replaced with one obtained by the client.  Current key is a personal API from a Tech Academy student.
+                <script async defer
+                        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJXWe9gnpmgclIWOshOjGV_i5gUV--x_Q&callback=initMap">
+                </script>
+            }
+            
+        </div>
+        
+        
+        <div class="col-lg-6">
+			@if (User.IsInRole("Admin"))
+			{
+				<h3>@Html.ActionLink("Add New Job", "Create", "Jobs", null, new { @class = "btn btn-success" })</h3>
+			}
+			<h3 style="white-space:pre-line;font-weight:900;color:#23527e;">@Model.jobCount <span class="jobs">Jobs Available</span></h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="headerTitle" style="min-width:320px;">@Html.DisplayNameFor(model => model.jobs.FirstOrDefault().JobTitle)</th>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <th class="text-center">Edit</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.jobs.Any())
+                    {
+                        foreach (var item in Model.jobs)
+                        {
+                            <tr>
+                                <!-- <td> tags must have no whitespace -->
+                                <td class="tableTitle">@Html.DisplayFor(modelItem => item.JobTitle)</td>
+								@if (!User.IsInRole("Admin"))
+                                {
+                                    if (usersSavedJobIDs.Contains(item.JobID))
+                                    { <td class="text-center">Saved <i class="fa fa-floppy-o fa-lg" style="color:#808080;"></i></td> }
+                                    else
+                                    { <td class="text-center"><a onclick="SaveJob('@item.ID', this)">Save <i class="fa fa-floppy-o fa-lg" style="color:#da860e;"></i></a></td> }
+
+                                    <td><a href="@item.ApplicationLink" target="_blank">Apply <i class="fa fa-arrow-circle-right fa-lg" style="color:#337ab7"></i></a></td>
+                                }
+                                else if (User.IsInRole("Admin"))
+                                {
+									<td class="text-center">
+										<input type="button" class="btn btn-primary btn-sm editJobButton" value="Edit" onclick="location.href='@Url.Action("Edit", "Jobs", new { id = item.ID })'">
+									</td>
+								}
+                            </tr>
+						}
+					}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+	<div style="padding:20px;">
+		@if (User.IsInRole("Admin"))
+		{
+			@Html.ActionLink("Back to List", "Admin", "Home")
+		}
+		else
+		{
+			@Html.ActionLink("Back to List", "Index", "Jobs")
+		}
+	</div>
+</div>
+           
+
+
+
+
+
+
+                    <script type="text/javascript" language="javascript">
+    function SaveCompany(name, trigger) {
+        $(trigger).addClass('disabled');
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("Save", "Dashboard")?name=' + name,
+            success: function () {
+            $("#saveCompanyModal").modal('show'); //pop in modal
+            $("#saveCompanyModal").delay(2000).fadeOut(500); //2 second before fade out, fading last 0.5 sec
+            setTimeout(function () {
+                $("#saveCompanyModal").modal('hide'); // after fade is done hide modal completely
+                }, 2500);// 3 seconds, total time modal is displayed
+            }
+        });
+        
+}
+
+    function SaveJob(id, trigger) {
+        $(trigger).addClass('disabled');
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("Save", "Jobs")?jobId=' + id,
+            success: function () {
+            $("#saveJobModal").modal('show'); //pop in modal
+            $("#saveJobModal").delay(2000).fadeOut(500); //2 second before fade out, fading last 0.5 sec
+            setTimeout(function () {
+                $("#saveJobModal").modal('hide'); // after fade is done hide modal completely
+                }, 2500);// 3 seconds, total time modal is displayed
+            }
+        });
+    }
+</script>
+

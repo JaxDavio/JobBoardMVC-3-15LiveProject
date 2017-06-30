@@ -1,0 +1,52 @@
+﻿@model JobBoardMvcContext
+
+@{
+    ViewBag.Title = "Srapes";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, user-scalable=no, maximum-scale=1.0, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link href="../../Content/Site.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div id="AdminRoleContainer">
+        <h2>Available Sites To Scrape</h2>
+
+        <br />
+
+        <h4>Company Name</h4>
+        
+            
+                    @foreach (Company company in Model.Companies)
+                    {
+                        <p>@company.CompanyName
+
+                        @if (company.JobCode != null)
+                        {
+
+
+                            <button onclick="location.href='@Url.Action("Scrape", "Scrapes", new { id = company.CompanyName } )'">Scrape</button>
+                        }
+                        </p>
+
+
+
+
+                    }
+                    
+            
+
+        
+            
+        
+
+
+    </div>
+</body>
+</html>
